@@ -8,6 +8,8 @@ pub fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let new = MenuItem::with_id(app, "new", "New", true, Some("Ctrl+N"))?;
     let open = MenuItem::with_id(app, "open", "Open…", true, Some("Ctrl+O"))?;
     let load_sample = MenuItem::with_id(app, "load_sample", "Open Sample", true, None::<&str>)?;
+    let save = MenuItem::with_id(app, "save", "Save", true, Some("Ctrl+S"))?;
+    let save_as = MenuItem::with_id(app, "save_as", "Save As…", true, Some("Ctrl+Shift+S"))?;
     let export_pdf = MenuItem::with_id(app, "export_pdf", "Export to PDF", true, Some("Ctrl+Shift+E"))?;
     let quit = PredefinedMenuItem::quit(app, Some("Quit"))?;
 
@@ -15,7 +17,7 @@ pub fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         app,
         "File",
         true,
-        &[&new, &open, &load_sample, &export_pdf, &quit],
+        &[&new, &open, &load_sample, &save, &save_as, &export_pdf, &quit],
     )?;
 
     let layout_split =
@@ -57,9 +59,15 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     let quit = MenuItem::with_id(app, "tray_quit", "Quit", true, None::<&str>)?;
     let tray_menu = Menu::with_items(app, &[&show, &quit])?;
 
-    let _tray = TrayIconBuilder::new()
+    let mut builder = TrayIconBuilder::new()
         .menu(&tray_menu)
-        .tooltip("FileForge")
+        .tooltip("FileForge");
+
+    if let Some(icon) = app.default_window_icon() {
+        builder = builder.icon(icon.clone());
+    }
+
+    let _tray = builder
         .on_menu_event(|app, event| match event.id.as_ref() {
             "tray_show" => {
                 if let Some(window) = app.get_webview_window("main") {

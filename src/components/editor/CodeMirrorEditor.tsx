@@ -92,9 +92,11 @@ export function CodeMirrorEditor({ disabled, onError }: CodeMirrorEditorProps) {
     validateAndReadFile(
       file,
       (fileContent, filename) =>
-        useDocumentStore
-          .getState()
-          .setContent(fileContent, { filename, dirty: false }),
+        useDocumentStore.getState().openDocument({
+          content: fileContent,
+          filename,
+          filePath: null,
+        }),
       onError,
     );
   };

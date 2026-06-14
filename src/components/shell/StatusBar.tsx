@@ -19,6 +19,7 @@ const LAYOUT_LABELS: Record<
 export function StatusBar() {
   const content = useDocumentStore((s) => s.content);
   const filename = useDocumentStore((s) => s.filename);
+  const filePath = useDocumentStore((s) => s.filePath);
   const isDirty = useDocumentStore((s) => s.isDirty);
   const isConverting = useDocumentStore((s) => s.isConverting);
   const convertProgress = useDocumentStore((s) => s.convertProgress);
@@ -29,6 +30,7 @@ export function StatusBar() {
   const hasContent = content.trim().length > 0;
   const layout = LAYOUT_LABELS[layoutMode];
   const LayoutIcon = layout.icon;
+  const displayLabel = filePath ?? filename ?? "Untitled";
 
   return (
     <footer className="flex h-7 shrink-0 items-center justify-between gap-3 border-t border-border bg-muted/30 px-3 text-xs text-muted-foreground">
@@ -45,8 +47,11 @@ export function StatusBar() {
                 <span className="shrink-0">·</span>
               </>
             )}
-            <strong className="truncate font-medium text-foreground">
-              {filename ?? "Untitled"}
+            <strong
+              className="truncate font-medium text-foreground"
+              title={filePath ?? undefined}
+            >
+              {displayLabel}
             </strong>
             <span className="hidden shrink-0 sm:inline">·</span>
             <span className="hidden shrink-0 sm:inline">

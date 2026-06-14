@@ -13,6 +13,7 @@ export type DiscardAction = "new" | "open" | "sample" | "close";
 interface UnsavedChangesDialogProps {
   open: boolean;
   action?: DiscardAction;
+  onSave: () => void;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -22,26 +23,27 @@ const ACTION_COPY: Record<
   { title: string; description: string }
 > = {
   new: {
-    title: "Discard unsaved changes?",
+    title: "Save changes?",
     description: "Your current document has unsaved changes.",
   },
   open: {
-    title: "Discard unsaved changes?",
+    title: "Save changes?",
     description: "Opening a file will replace your current document.",
   },
   sample: {
-    title: "Discard unsaved changes?",
+    title: "Save changes?",
     description: "Loading the sample will replace your current document.",
   },
   close: {
-    title: "Discard unsaved changes?",
-    description: "Closing will discard unsaved changes.",
+    title: "Save changes?",
+    description: "Closing will discard unsaved changes unless you save first.",
   },
 };
 
 export function UnsavedChangesDialog({
   open,
   action = "new",
+  onSave,
   onConfirm,
   onCancel,
 }: UnsavedChangesDialogProps) {
@@ -63,9 +65,10 @@ export function UnsavedChangesDialog({
           <Button variant="ghost" onClick={onCancel}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
-            Discard
+          <Button variant="outline" onClick={onConfirm}>
+            Don&apos;t Save
           </Button>
+          <Button onClick={onSave}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

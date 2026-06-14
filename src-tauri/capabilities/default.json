@@ -20,7 +20,9 @@
     "dialog:default",
     "fs:default",
     "fs:allow-write-file",
+    "fs:allow-write-text-file",
     "fs:allow-read-file",
+    "fs:allow-rename",
     "process:default",
     "updater:default",
     "window-state:default"

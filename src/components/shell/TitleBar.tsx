@@ -9,6 +9,7 @@ import {
   MonitorIcon,
   MoonIcon,
   PencilIcon,
+  SaveIcon,
   SettingsIcon,
   SquareIcon,
   SunIcon,
@@ -27,7 +28,9 @@ import {
 import { useDocumentStore } from "@/stores/document-store";
 
 interface TitleBarProps {
+  onSave: () => void;
   onExport: () => void;
+  onRename: () => void;
   onClose: () => void;
   onOpenPreferences: (tab?: PreferencesTab) => void;
   onCheckUpdates: () => void;
@@ -51,7 +54,9 @@ function themeIcon(mode: ThemeMode) {
 }
 
 export function TitleBar({
+  onSave,
   onExport,
+  onRename,
   onClose,
   onOpenPreferences,
   onCheckUpdates,
@@ -121,10 +126,18 @@ export function TitleBar({
       </div>
 
       <div
-        className="pointer-events-none truncate text-center text-[0.8125rem] font-medium text-muted-foreground"
+        className="flex min-w-0 justify-center"
         data-tauri-drag-region
       >
-        {displayName}
+        <button
+          type="button"
+          className="pointer-events-auto max-w-full truncate rounded-md px-2 py-0.5 text-center text-[0.8125rem] font-medium text-muted-foreground transition-colors hover:bg-accent/10 hover:text-foreground"
+          title={`${displayName} (click to rename, F2)`}
+          aria-label={`Rename ${displayName}`}
+          onClick={onRename}
+        >
+          {displayName}
+        </button>
       </div>
 
       <div className="flex items-center justify-end gap-0.5">
@@ -156,6 +169,17 @@ export function TitleBar({
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onSave}
+          disabled={!isDirty}
+          title={`Save (${MOD_LABEL}+S)`}
+        >
+          <SaveIcon />
+          Save
+        </Button>
 
         <Button
           variant="default"

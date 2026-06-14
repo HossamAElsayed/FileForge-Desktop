@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { PreferencesDialog } from "@/components/settings/PreferencesDialog";
 import { ActivityToolbar } from "@/components/shell/ActivityToolbar";
 import { EditorLayout } from "@/components/shell/EditorLayout";
+import { RenameDocumentDialog } from "@/components/shell/RenameDocumentDialog";
 import { StatusBar } from "@/components/shell/StatusBar";
 import { TitleBar } from "@/components/shell/TitleBar";
 import {
@@ -20,6 +21,11 @@ import {
 } from "@/lib/tauri/export";
 import { openFilePath, showFileInFolder } from "@/lib/tauri/open-path";
 import { openMarkdownFile } from "@/lib/tauri/open-file";
+import { renameMarkdownFile } from "@/lib/tauri/rename-file";
+import {
+  saveMarkdownFileAs,
+  saveOrSaveAs,
+} from "@/lib/tauri/save-file";
 import { APP_NAME } from "@/lib/app-metadata";
 import { isModKey } from "@/lib/keyboard";
 import { SAMPLE_MARKDOWN } from "@/lib/constants";
@@ -64,6 +70,9 @@ function useWindowTitle(filename: string | null, isDirty: boolean) {
 function useMenuShortcuts(handlers: {
   onNew: () => void;
   onOpen: () => void;
+  onSave: () => void;
+  onSaveAs: () => void;
+  onRename: () => void;
   onLoadSample: () => void;
   onExport: () => void;
   onOpenPreferences: (tab?: "general" | "about" | "shortcuts") => void;
@@ -81,6 +90,18 @@ function useMenuShortcuts(handlers: {
       if (isModKey(event) && event.key === "o") {
         event.preventDefault();
         handlers.onOpen();
+      }
+      if (isModKey(event) && event.key === "s") {
+        event.preventDefault();
+        if (event.shiftKey) {
+          handlers.onSaveAs();
+        } else {
+          handlers.onSave();
+        }
+      }
+      if (event.key === "F2") {
+        event.preventDefault();
+        handlers.onRename();
       }
       if (isModKey(event) && event.shiftKey && event.key === "E") {
         event.preventDefault();
@@ -126,6 +147,12 @@ function useMenuShortcuts(handlers: {
           break;
         case "load_sample":
           handlers.onLoadSample();
+          break;
+        case "save":
+          handlers.onSave();
+          break;
+        case "save_as":
+          handlers.onSaveAs();
           break;
         case "export_pdf":
           handlers.onExport();
@@ -183,13 +210,18 @@ export default function App() {
   useThemeEffect();
 
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [pendingDiscard, setPendingDiscard] = useState<DiscardAction | null>(
     null,
   );
 
-  const setContent = useDocumentStore((s) => s.setContent);
+  const openDocument = useDocumentStore((s) => s.openDocument);
+  const setFilename = useDocumentStore((s) => s.setFilename);
+  const setFilePath = useDocumentStore((s) => s.setFilePath);
+  const markClean = useDocumentStore((s) => s.markClean);
   const content = useDocumentStore((s) => s.content);
   const filename = useDocumentStore((s) => s.filename);
+  const filePath = useDocumentStore((s) => s.filePath);
   const isDirty = useDocumentStore((s) => s.isDirty);
   const newDocument = useDocumentStore((s) => s.newDocument);
   const setConverting = useDocumentStore((s) => s.setConverting);
@@ -207,24 +239,83 @@ export default function App() {
     await getCurrentWindow().hide();
   }, []);
 
+  const applySavedDocument = useCallback(
+    (path: string, savedFilename: string) => {
+      setFilePath(path);
+      setFilename(savedFilename);
+      markClean();
+    },
+    [setFilePath, setFilename, markClean],
+  );
+
+  const performSave = useCallback(async (): Promise<boolean> => {
+    if (!content.trim()) {
+      handleError("Nothing to save.");
+      return false;
+    }
+    if (!validateContentSize(content, handleError)) return false;
+
+    try {
+      const result = await saveOrSaveAs(content, filePath, filename);
+      applySavedDocument(result.path, result.filename);
+      toast.success("File saved", { description: result.filename });
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save file";
+      if (message !== "Save cancelled") {
+        handleError(message);
+      }
+      return false;
+    }
+  }, [content, filePath, filename, applySavedDocument, handleError]);
+
+  const performSaveAs = useCallback(async (): Promise<boolean> => {
+    if (!content.trim()) {
+      handleError("Nothing to save.");
+      return false;
+    }
+    if (!validateContentSize(content, handleError)) return false;
+
+    try {
+      const result = await saveMarkdownFileAs(content, filename);
+      applySavedDocument(result.path, result.filename);
+      toast.success("File saved", { description: result.filename });
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save file";
+      if (message !== "Save cancelled") {
+        handleError(message);
+      }
+      return false;
+    }
+  }, [content, filename, applySavedDocument, handleError]);
+
   const performOpen = useCallback(async () => {
     try {
       const result = await openMarkdownFile();
       if (result) {
-        setContent(result.content, { filename: result.filename, dirty: false });
+        openDocument({
+          content: result.content,
+          filename: result.filename,
+          filePath: result.filePath,
+        });
         useDocumentStore.getState().requestEditorFocus();
         toast.success("File opened", { description: result.filename });
       }
     } catch (error) {
       handleError(error instanceof Error ? error.message : "Failed to open file");
     }
-  }, [setContent, handleError]);
+  }, [openDocument, handleError]);
 
   const performLoadSample = useCallback(() => {
-    setContent(SAMPLE_MARKDOWN, { filename: "sample.md", dirty: false });
+    openDocument({
+      content: SAMPLE_MARKDOWN,
+      filename: "sample.md",
+      filePath: null,
+    });
     useDocumentStore.getState().requestEditorFocus();
     toast.success("Sample loaded", { description: "sample.md" });
-  }, [setContent]);
+  }, [openDocument]);
 
   const performNewDocument = useCallback(() => {
     newDocument();
@@ -272,6 +363,44 @@ export default function App() {
     },
     [isDirty],
   );
+
+  const handleSave = useCallback(() => {
+    void performSave();
+  }, [performSave]);
+
+  const handleSaveAs = useCallback(() => {
+    void performSaveAs();
+  }, [performSaveAs]);
+
+  const handleRename = useCallback(
+    async (newFilename: string) => {
+      setRenameDialogOpen(false);
+
+      if (filePath) {
+        try {
+          const result = await renameMarkdownFile(filePath, newFilename);
+          setFilePath(result.path);
+          setFilename(result.filename);
+          toast.success("File renamed", { description: result.filename });
+        } catch (error) {
+          handleError(
+            error instanceof Error ? error.message : "Failed to rename file",
+          );
+        }
+        return;
+      }
+
+      setFilename(newFilename);
+      toast.success("Document renamed", { description: newFilename });
+    },
+    [filePath, setFilePath, setFilename, handleError],
+  );
+
+  const handleUnsavedSave = useCallback(async () => {
+    const saved = await performSave();
+    if (!saved) return;
+    await runPendingDiscard();
+  }, [performSave, runPendingDiscard]);
 
   const handleNew = useCallback(() => {
     withDiscardGuard("new", performNewDocument);
@@ -362,6 +491,9 @@ export default function App() {
   useMenuShortcuts({
     onNew: handleNew,
     onOpen: handleOpen,
+    onSave: handleSave,
+    onSaveAs: handleSaveAs,
+    onRename: () => setRenameDialogOpen(true),
     onLoadSample: handleLoadSample,
     onExport: handleExport,
     onOpenPreferences: openPreferences,
@@ -372,7 +504,9 @@ export default function App() {
     <TooltipProvider delay={400}>
       <div className="app-shell">
         <TitleBar
+          onSave={handleSave}
           onExport={handleExport}
+          onRename={() => setRenameDialogOpen(true)}
           onClose={handleClose}
           onOpenPreferences={openPreferences}
           onCheckUpdates={handleCheckUpdates}
@@ -381,6 +515,7 @@ export default function App() {
           <ActivityToolbar
             onNew={handleNew}
             onOpen={handleOpen}
+            onSave={handleSave}
             onLoadSample={handleLoadSample}
           />
           <EditorLayout onError={handleError} />
@@ -390,11 +525,19 @@ export default function App() {
         <UnsavedChangesDialog
           open={unsavedDialogOpen}
           action={pendingDiscard ?? "new"}
+          onSave={handleUnsavedSave}
           onConfirm={runPendingDiscard}
           onCancel={() => {
             setUnsavedDialogOpen(false);
             setPendingDiscard(null);
           }}
+        />
+        <RenameDocumentDialog
+          open={renameDialogOpen}
+          filename={filename}
+          filePath={filePath}
+          onConfirm={handleRename}
+          onCancel={() => setRenameDialogOpen(false)}
         />
         <Toaster richColors position="bottom-right" closeButton />
       </div>

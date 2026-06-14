@@ -6,6 +6,7 @@ import { MAX_FILE_SIZE_BYTES, SUPPORTED_INPUT_EXTENSIONS } from "@/lib/constants
 export async function openMarkdownFile(): Promise<{
   content: string;
   filename: string;
+  filePath: string;
 } | null> {
   const selected = await open({
     multiple: false,
@@ -30,5 +31,5 @@ export async function openMarkdownFile(): Promise<{
   }
 
   const filename = selected.split(/[/\\]/).pop() ?? "document.md";
-  return { content, filename };
+  return { content, filename, filePath: selected };
 }

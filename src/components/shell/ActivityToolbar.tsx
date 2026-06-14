@@ -9,6 +9,7 @@ import {
   LinkIcon,
   ListIcon,
   QuoteIcon,
+  SaveIcon,
   SparklesIcon,
 } from "lucide-react";
 
@@ -28,6 +29,7 @@ import { cn } from "@/lib/utils";
 interface ActivityToolbarProps {
   onNew: () => void;
   onOpen: () => void;
+  onSave: () => void;
   onLoadSample: () => void;
 }
 
@@ -89,9 +91,11 @@ function ToolbarGroup({
 export function ActivityToolbar({
   onNew,
   onOpen,
+  onSave,
   onLoadSample,
 }: ActivityToolbarProps) {
   const isConverting = useDocumentStore((s) => s.isConverting);
+  const isDirty = useDocumentStore((s) => s.isDirty);
   const insertMarkdown = useEditorStore((s) => s.insertMarkdown);
   const view = useEditorStore((s) => s.view);
   const layoutMode = useSettingsStore((s) => s.layoutMode);
@@ -138,6 +142,14 @@ export function ActivityToolbar({
       icon: <FolderOpenIcon />,
       onClick: onOpen,
       disabled: fileDisabled,
+    },
+    {
+      id: "save",
+      label: "Save",
+      shortcut: "Ctrl+S",
+      icon: <SaveIcon />,
+      onClick: onSave,
+      disabled: fileDisabled || !isDirty,
     },
     {
       id: "sample",

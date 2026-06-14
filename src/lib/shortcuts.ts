@@ -16,6 +16,9 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { keys: `${MOD_LABEL}+N`, action: "New document" },
       { keys: `${MOD_LABEL}+O`, action: "Open file" },
+      { keys: `${MOD_LABEL}+S`, action: "Save" },
+      { keys: `${MOD_LABEL}+Shift+S`, action: "Save As" },
+      { keys: "F2", action: "Rename document" },
       { keys: `${MOD_LABEL}+Shift+E`, action: "Export to PDF" },
     ],
   },
