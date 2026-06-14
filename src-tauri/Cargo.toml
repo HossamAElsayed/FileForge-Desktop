@@ -2,7 +2,7 @@
 name = "fileforge-desktop"
 version = "0.1.0"
 description = "FileForge Desktop — Markdown to PDF converter"
-authors = ["Hossam"]
+authors = ["Hossam A. Elsayed"]
 edition = "2021"
 
 [lib]
@@ -23,3 +23,5 @@ tauri-plugin-window-state = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tempfile = "3"
+# alloc-stdlib 0.2.3 pulls alloc-no-stdlib 3.0.0, which breaks brotli-decompressor.
+alloc-stdlib = "=0.2.2"

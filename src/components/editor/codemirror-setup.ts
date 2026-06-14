@@ -143,3 +143,23 @@ export const createMarkdownEditor = {
     }
   },
 };
+
+export interface MarkdownSnippet {
+  before: string;
+  after?: string;
+  placeholder?: string;
+}
+
+export function insertSnippet(view: EditorView, snippet: MarkdownSnippet) {
+  const { from, to } = view.state.selection.main;
+  const selected = view.state.sliceDoc(from, to);
+  const after = snippet.after ?? "";
+  const text = selected || snippet.placeholder || "";
+  const insert = `${snippet.before}${text}${after}`;
+
+  view.dispatch({
+    changes: { from, to, insert },
+    selection: { anchor: from + snippet.before.length + text.length },
+  });
+  view.focus();
+}

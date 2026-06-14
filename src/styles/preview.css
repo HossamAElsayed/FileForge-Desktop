@@ -71,8 +71,8 @@
 .markdown-preview pre {
   border-radius: 8px;
   overflow-x: auto;
-  background: #1e1e2e;
-  color: #cdd6f4;
+  background: var(--muted);
+  color: var(--foreground);
   padding: 1em;
 }
 
@@ -97,15 +97,6 @@
 .markdown-preview th {
   background: var(--muted);
   font-weight: 600;
-}
-
-.markdown-preview .empty-preview {
-  display: flex;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
 }
 
 .token.comment,

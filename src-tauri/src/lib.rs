@@ -2,6 +2,7 @@ mod pdf;
 mod tray;
 
 use pdf::generate_pdf_from_html;
+use tauri::Manager;
 
 #[tauri::command]
 fn generate_pdf(html: String) -> Result<Vec<u8>, pdf::PdfError> {

@@ -15,8 +15,9 @@ A production-ready Tauri 2 desktop app for converting Markdown to PDF locally. B
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 20+
-- [pnpm](https://pnpm.io/)
-- [Rust](https://www.rust-lang.org/tools/install)
+- [pnpm](https://pnpm.io/) 9+
+- [Rust](https://www.rust-lang.org/tools/install) (`rustup`)
+- **Windows:** [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with the "Desktop development with C++" workload (provides `link.exe`)
 - [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your OS
 - **Google Chrome** or **Microsoft Edge** (required for PDF export)
 
@@ -39,9 +40,16 @@ Produces installers for your current platform (`.msi`/`.exe` on Windows, `.dmg`/
 
 | Shortcut | Action |
 |----------|--------|
+| `Ctrl+N` | New document |
 | `Ctrl+O` | Open file |
 | `Ctrl+Shift+E` | Export to PDF |
+| `Ctrl+1` | Split view |
+| `Ctrl+2` | Focus mode |
+| `Ctrl+3` | Preview only |
 | `Ctrl+,` | Settings |
+| `F1` | Keyboard shortcuts |
+
+On macOS, use `Cmd` instead of `Ctrl`.
 
 ## Project structure
 

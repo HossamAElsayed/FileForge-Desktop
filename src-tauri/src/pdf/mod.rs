@@ -16,12 +16,6 @@ impl std::fmt::Display for PdfError {
     }
 }
 
-impl From<PdfError> for tauri::ipc::InvokeError {
-    fn from(err: PdfError) -> Self {
-        tauri::ipc::InvokeError::from(err.to_string())
-    }
-}
-
 pub fn find_browser() -> Option<PathBuf> {
     let candidates: Vec<PathBuf> = if cfg!(target_os = "windows") {
         let local_app_data = std::env::var("LOCALAPPDATA").unwrap_or_default();

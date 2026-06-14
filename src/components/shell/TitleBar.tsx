@@ -1,46 +1,81 @@
+import { useCallback, useEffect, useState } from "react";
 import {
   Columns2Icon,
+  CopyIcon,
   DownloadIcon,
   EyeIcon,
   Loader2Icon,
+  MinusIcon,
   MonitorIcon,
   MoonIcon,
   PencilIcon,
   SettingsIcon,
+  SquareIcon,
   SunIcon,
+  XIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { HelpMenu } from "@/components/shell/HelpMenu";
+import { MOD_LABEL } from "@/lib/keyboard";
 import type { LayoutMode, ThemeMode } from "@/themes";
-import { useSettingsStore } from "@/stores/settings-store";
+import {
+  useSettingsStore,
+  type PreferencesTab,
+} from "@/stores/settings-store";
 import { useDocumentStore } from "@/stores/document-store";
 
 interface TitleBarProps {
   onExport: () => void;
+  onClose: () => void;
+  onOpenPreferences: (tab?: PreferencesTab) => void;
+  onCheckUpdates: () => void;
 }
 
-const LAYOUT_MODES: { value: LayoutMode; label: string; icon: React.ReactNode }[] = [
-  { value: "split", label: "Split", icon: <Columns2Icon size={14} /> },
-  { value: "focus", label: "Focus", icon: <PencilIcon size={14} /> },
-  { value: "preview", label: "Preview", icon: <EyeIcon size={14} /> },
+const LAYOUT_MODES: {
+  value: LayoutMode;
+  label: string;
+  shortcut: string;
+  icon: React.ReactNode;
+}[] = [
+  { value: "split", label: "Split", shortcut: `${MOD_LABEL}+1`, icon: <Columns2Icon /> },
+  { value: "focus", label: "Focus", shortcut: `${MOD_LABEL}+2`, icon: <PencilIcon /> },
+  { value: "preview", label: "Preview", shortcut: `${MOD_LABEL}+3`, icon: <EyeIcon /> },
 ];
 
 function themeIcon(mode: ThemeMode) {
-  if (mode === "dark") return <MoonIcon size={14} />;
-  if (mode === "light") return <SunIcon size={14} />;
-  return <MonitorIcon size={14} />;
+  if (mode === "dark") return <MoonIcon />;
+  if (mode === "light") return <SunIcon />;
+  return <MonitorIcon />;
 }
 
-export function TitleBar({ onExport }: TitleBarProps) {
+export function TitleBar({
+  onExport,
+  onClose,
+  onOpenPreferences,
+  onCheckUpdates,
+}: TitleBarProps) {
   const layoutMode = useSettingsStore((s) => s.layoutMode);
   const setLayoutMode = useSettingsStore((s) => s.setLayoutMode);
   const themeMode = useSettingsStore((s) => s.themeMode);
   const cycleThemeMode = useSettingsStore((s) => s.cycleThemeMode);
-  const setSettingsOpen = useSettingsStore((s) => s.setSettingsOpen);
 
   const filename = useDocumentStore((s) => s.filename);
+  const isDirty = useDocumentStore((s) => s.isDirty);
   const hasContent = useDocumentStore((s) => s.content.trim().length > 0);
   const isConverting = useDocumentStore((s) => s.isConverting);
+
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  const syncMaximized = useCallback(async () => {
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    setIsMaximized(await getCurrentWindow().isMaximized());
+  }, []);
+
+  useEffect(() => {
+    syncMaximized();
+  }, [syncMaximized]);
 
   const handleMinimize = async () => {
     const { getCurrentWindow } = await import("@tauri-apps/api/window");
@@ -55,99 +90,142 @@ export function TitleBar({ onExport }: TitleBarProps) {
     } else {
       await win.maximize();
     }
+    await syncMaximized();
   };
 
-  const handleClose = async () => {
-    const { getCurrentWindow } = await import("@tauri-apps/api/window");
-    await getCurrentWindow().hide();
-  };
+  const displayName = `${isDirty ? "* " : ""}${filename ?? "Untitled"}`;
 
   return (
-    <header className="titlebar" data-tauri-drag-region>
-      <div className="titlebar-brand" data-tauri-drag-region>
+    <header
+      className="relative z-20 grid h-[38px] shrink-0 grid-cols-[auto_1fr_auto] items-center border-b border-border bg-background/80 px-3 backdrop-blur-md select-none"
+      data-tauri-drag-region
+    >
+      <div className="flex min-w-0 items-center gap-2" data-tauri-drag-region>
         <div className="titlebar-spacer" />
-        <img src="/tauri.svg" alt="" aria-hidden="true" />
-        <span>FileForge</span>
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-md px-0.5 transition-colors hover:bg-accent/10"
+          title="About FileForge"
+          aria-label="About FileForge"
+          onClick={() => onOpenPreferences("about")}
+        >
+          <img
+            src="/logo.png"
+            alt="FileForge"
+            className="size-[18px] rounded object-contain"
+          />
+          <span className="text-[0.8125rem] font-semibold text-foreground">
+            FileForge
+          </span>
+        </button>
       </div>
 
-      <div className="titlebar-title" data-tauri-drag-region>
-        {filename ?? "Untitled"}
+      <div
+        className="pointer-events-none truncate text-center text-[0.8125rem] font-medium text-muted-foreground"
+        data-tauri-drag-region
+      >
+        {displayName}
       </div>
 
-      <div className="titlebar-controls">
-        <div className="layout-switcher">
+      <div className="flex items-center justify-end gap-0.5">
+        <ToggleGroup
+          value={[layoutMode]}
+          onValueChange={(next) => {
+            const selected = next[0] as LayoutMode | undefined;
+            if (
+              selected === "split" ||
+              selected === "focus" ||
+              selected === "preview"
+            ) {
+              setLayoutMode(selected);
+            }
+          }}
+          variant="outline"
+          size="sm"
+          spacing={0}
+          aria-label="Editor layout"
+        >
           {LAYOUT_MODES.map((mode) => (
-            <button
+            <ToggleGroupItem
               key={mode.value}
-              type="button"
-              className={`tb-btn icon-only ${layoutMode === mode.value ? "active" : ""}`}
-              title={mode.label}
+              value={mode.value}
               aria-label={mode.label}
-              onClick={() => setLayoutMode(mode.value)}
+              title={`${mode.label} (${mode.shortcut})`}
             >
               {mode.icon}
-            </button>
+            </ToggleGroupItem>
           ))}
-        </div>
+        </ToggleGroup>
 
-        <button
-          type="button"
-          className="tb-btn"
+        <Button
+          variant="default"
+          size="sm"
           onClick={onExport}
           disabled={!hasContent || isConverting}
-          title="Export to PDF (Ctrl+Shift+E)"
+          title={`Export to PDF (${MOD_LABEL}+Shift+E)`}
+          className="ml-1"
         >
           {isConverting ? (
-            <Loader2Icon size={14} className="animate-spin" />
+            <Loader2Icon className="animate-spin" />
           ) : (
-            <DownloadIcon size={14} />
+            <DownloadIcon />
           )}
           Export PDF
-        </button>
+        </Button>
 
-        <button
-          type="button"
-          className="tb-btn icon-only"
+        <Button
+          variant="ghost"
+          size="icon-sm"
           title={`Theme: ${themeMode}`}
           aria-label="Cycle theme"
           onClick={cycleThemeMode}
         >
           {themeIcon(themeMode)}
-        </button>
+        </Button>
 
-        <button
-          type="button"
-          className="tb-btn icon-only"
-          title="Settings (Ctrl+,)"
+        <HelpMenu
+          onOpenPreferences={onOpenPreferences}
+          onCheckUpdates={onCheckUpdates}
+        />
+
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          title={`Settings (${MOD_LABEL}+,)`}
           aria-label="Settings"
-          onClick={() => setSettingsOpen(true)}
+          onClick={() => onOpenPreferences("general")}
         >
-          <SettingsIcon size={14} />
-        </button>
+          <SettingsIcon />
+        </Button>
 
-        <div className="window-controls">
-          <button type="button" className="window-btn" onClick={handleMinimize} aria-label="Minimize">
-            ─
-          </button>
-          <button type="button" className="window-btn" onClick={handleMaximize} aria-label="Maximize">
-            ▢
-          </button>
-          <button type="button" className="window-btn close" onClick={handleClose} aria-label="Close">
-            ✕
-          </button>
+        <div className="ml-2 flex items-center gap-px">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleMinimize}
+            aria-label="Minimize"
+          >
+            <MinusIcon />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleMaximize}
+            aria-label={isMaximized ? "Restore" : "Maximize"}
+          >
+            {isMaximized ? <CopyIcon /> : <SquareIcon />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClose}
+            aria-label="Close"
+            className="hover:bg-destructive hover:text-destructive-foreground"
+          >
+            <XIcon />
+          </Button>
         </div>
       </div>
     </header>
-  );
-}
-
-export function ExportMenu({ onExport }: { onExport: () => void }) {
-  const hasContent = useDocumentStore((s) => s.content.trim().length > 0);
-  const isConverting = useDocumentStore((s) => s.isConverting);
-
-  return (
-    <Button onClick={onExport} disabled={!hasContent || isConverting}>
-      {isConverting ? "Exporting…" : "Export to PDF"}
-    </Button>
   );
 }
