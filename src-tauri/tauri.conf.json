@@ -44,7 +44,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "REPLACE_WITH_TAURI_SIGNER_PUBLIC_KEY",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQyMEFDN0I1MzdBREMxQUEKUldTcXdhMDN0Y2NLUWtaT0c5UHE3dDR4MnFjMnM0dkRDcUZsTDYrZ01udFhHc3BGMXYrNUNycGgK",
       "endpoints": [
         "https://github.com/HossamAElsayed/FileForge-Desktop/releases/latest/download/latest.json"
       ]
