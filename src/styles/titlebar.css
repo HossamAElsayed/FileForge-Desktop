@@ -1,0 +1,210 @@
+.titlebar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  height: 38px;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+  background: var(--toolbar-bg);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+}
+
+.titlebar-spacer {
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.titlebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.titlebar-brand img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.titlebar-brand span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.titlebar-title {
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.titlebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-content: flex-end;
+}
+
+.tb-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  padding: 0.3rem 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--foreground);
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.tb-btn:hover {
+  background: var(--btn-hover);
+  color: var(--accent);
+}
+
+.tb-btn:active {
+  transform: scale(0.94);
+}
+
+.tb-btn.active {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tb-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tb-btn.icon-only {
+  padding: 0.25rem 0.35rem;
+}
+
+.layout-switcher {
+  display: flex;
+  background: var(--btn-hover);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 1px;
+}
+
+.layout-switcher .tb-btn {
+  border-radius: 6px;
+  padding: 0.15rem 0.35rem;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: 0.5rem;
+}
+
+.window-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.window-btn:hover {
+  background: var(--btn-hover);
+  color: var(--foreground);
+}
+
+.window-btn.close:hover {
+  background: #e81123;
+  color: white;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 28px;
+  padding: 0 0.75rem;
+  border-top: 1px solid var(--border);
+  background: var(--toolbar-bg);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.status-bar strong {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.editor-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  width: 100%;
+  background: var(--background);
+  transition: background 0.25s;
+}
+
+.editor-pane,
+.preview-pane {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.pane-divider {
+  width: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.editor-container.preview .preview-pane .preview-content,
+.editor-container.focus .editor-pane .cm-scroller {
+  padding-left: max(2.5rem, calc((100% - 780px) / 2));
+  padding-right: max(2.5rem, calc((100% - 780px) / 2));
+}
+
+.panel-enter {
+  animation: panel-in 0.2s ease;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
