@@ -1,6 +1,8 @@
 # FileForge Desktop
 
-A production-ready Tauri 2 desktop app for converting Markdown to PDF locally. Built with a Texodus-inspired native UI shell.
+A production-ready Tauri 2 desktop app for converting Markdown to PDF locally.
+
+![FileForge Desktop — split editor and live preview](public/fileforge-desktop-app-screenshot.png)
 
 ## Features
 
@@ -64,4 +66,6 @@ PDF export uses your locally installed Chrome or Edge in headless mode. Set `PUP
 
 ## License
 
-Private — FileForge
+This project is open source under the [MIT License](LICENSE).
+
+Copyright (c) 2026 Hossam A. Elsayed
