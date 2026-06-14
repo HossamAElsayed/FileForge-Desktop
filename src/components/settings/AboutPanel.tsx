@@ -27,7 +27,7 @@ export function AboutPanel({ active }: AboutPanelProps) {
     if (!active) return;
     getAppVersion()
       .then(setVersion)
-      .catch(() => setVersion("0.1.0"));
+      .catch(() => setVersion("0.1.1"));
   }, [active]);
 
   const handleCheckUpdates = async () => {

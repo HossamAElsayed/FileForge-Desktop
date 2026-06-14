@@ -38,6 +38,16 @@ pnpm tauri build
 
 Produces installers for your current platform (`.msi`/`.exe` on Windows, `.dmg`/`.app` on macOS).
 
+## Releasing
+
+1. Bump the version in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` to the same value (e.g. `0.1.1`).
+2. Commit and push to `main`.
+3. Tag and push: `git tag v0.1.1 && git push origin v0.1.1`
+4. GitHub Actions builds installers and `latest.json`, then creates a draft release.
+5. Review assets on GitHub and publish the draft release.
+
+The git tag (`vX.Y.Z`) must match `tauri.conf.json` version (`X.Y.Z`). CI fails if they differ.
+
 ## Keyboard shortcuts
 
 | Shortcut | Action |

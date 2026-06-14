@@ -1,6 +1,6 @@
 [package]
 name = "fileforge-desktop"
-version = "0.1.0"
+version = "0.1.1"
 description = "FileForge Desktop — Markdown to PDF converter"
 authors = ["Hossam A. Elsayed"]
 edition = "2021"
