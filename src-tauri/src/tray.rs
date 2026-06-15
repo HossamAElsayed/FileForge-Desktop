@@ -34,6 +34,7 @@ pub fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     )?;
 
     let about = MenuItem::with_id(app, "about", "About FileForge", true, None::<&str>)?;
+    let whats_new = MenuItem::with_id(app, "whats_new", "What's New", true, None::<&str>)?;
     let keyboard_shortcuts = MenuItem::with_id(
         app,
         "keyboard_shortcuts",
@@ -48,7 +49,7 @@ pub fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         app,
         "Help",
         true,
-        &[&about, &keyboard_shortcuts, &settings, &check_updates],
+        &[&about, &whats_new, &keyboard_shortcuts, &settings, &check_updates],
     )?;
 
     Menu::with_items(app, &[&file_menu, &view_menu, &help_menu])

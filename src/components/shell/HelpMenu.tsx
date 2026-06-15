@@ -4,6 +4,7 @@ import {
   InfoIcon,
   KeyboardIcon,
   RefreshCwIcon,
+  ScrollTextIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -77,6 +78,15 @@ export function HelpMenu({
           >
             <InfoIcon className="size-3.5 text-muted-foreground" />
             About
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm hover:bg-accent/10"
+            onClick={() => run(() => onOpenPreferences("changelog"))}
+          >
+            <ScrollTextIcon className="size-3.5 text-muted-foreground" />
+            What's New
           </button>
           <button
             type="button"

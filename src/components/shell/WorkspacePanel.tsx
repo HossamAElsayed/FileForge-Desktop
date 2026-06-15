@@ -40,7 +40,7 @@ export function WorkspacePanel({
       data-layout={layoutMode}
       className={cn(
         "flex h-full w-full min-h-0 flex-col overflow-hidden",
-        variant === "editor" ? "bg-[var(--editor-bg)]" : "bg-[var(--preview-bg)]",
+        variant === "editor" ? "bg-(--editor-bg)" : "bg-(--preview-bg)",
       )}
     >
       <header className="flex h-7 shrink-0 items-center justify-between gap-2 border-b border-border/80 bg-background/40 px-3 backdrop-blur-sm">

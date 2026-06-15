@@ -7,7 +7,7 @@ import type {
   ThemeMode,
 } from "@/themes";
 
-export type PreferencesTab = "general" | "about" | "shortcuts";
+export type PreferencesTab = "general" | "about" | "changelog" | "shortcuts";
 
 interface SettingsState {
   themeMode: ThemeMode;

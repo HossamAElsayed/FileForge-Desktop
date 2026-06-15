@@ -75,7 +75,7 @@ function useMenuShortcuts(handlers: {
   onRename: () => void;
   onLoadSample: () => void;
   onExport: () => void;
-  onOpenPreferences: (tab?: "general" | "about" | "shortcuts") => void;
+  onOpenPreferences: (tab?: "general" | "about" | "changelog" | "shortcuts") => void;
   onCheckUpdates: () => void;
 }) {
   const setLayoutMode = useSettingsStore((s) => s.setLayoutMode);
@@ -159,6 +159,9 @@ function useMenuShortcuts(handlers: {
           break;
         case "about":
           openPreferences("about");
+          break;
+        case "whats_new":
+          openPreferences("changelog");
           break;
         case "keyboard_shortcuts":
           openPreferences("shortcuts");

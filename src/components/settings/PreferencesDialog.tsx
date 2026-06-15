@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import {
   InfoIcon,
   KeyboardIcon,
+  ScrollTextIcon,
   Settings2Icon,
 } from "lucide-react";
 
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { AboutPanel } from "@/components/settings/AboutPanel";
+import { ChangelogPanel } from "@/components/settings/ChangelogPanel";
 import { GeneralSettingsPanel } from "@/components/settings/GeneralSettingsPanel";
 import { ShortcutsPanel } from "@/components/settings/ShortcutsPanel";
 import {
@@ -41,6 +43,13 @@ const NAV_ITEMS: {
     icon: <InfoIcon className="size-3.5" />,
     title: "About FileForge",
     description: "Version, author, and updates.",
+  },
+  {
+    id: "changelog",
+    label: "What's New",
+    icon: <ScrollTextIcon className="size-3.5" />,
+    title: "What's New",
+    description: "Release history and improvements.",
   },
   {
     id: "shortcuts",
@@ -119,6 +128,9 @@ export function PreferencesDialog() {
             >
               {tab === "general" && <GeneralSettingsPanel />}
               {tab === "about" && <AboutPanel active={open && tab === "about"} />}
+              {tab === "changelog" && (
+                <ChangelogPanel active={open && tab === "changelog"} />
+              )}
               {tab === "shortcuts" && <ShortcutsPanel />}
             </div>
 
