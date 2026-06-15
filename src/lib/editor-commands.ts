@@ -260,17 +260,18 @@ export function openReplace(view: EditorView) {
   requestReplaceFieldFocus();
   openSearchPanel(view);
   const current = getSearchQuery(view.state);
-  setSearchQuery(
-    view,
-    new SearchQuery({
-      search: current.search,
-      replace: current.replace || "",
-      caseSensitive: current.caseSensitive,
-      literal: current.literal,
-      regexp: current.regexp,
-      wholeWord: current.wholeWord,
-    }),
-  );
+  view.dispatch({
+    effects: setSearchQuery.of(
+      new SearchQuery({
+        search: current.search,
+        replace: current.replace || "",
+        caseSensitive: current.caseSensitive,
+        literal: current.literal,
+        regexp: current.regexp,
+        wholeWord: current.wholeWord,
+      }),
+    ),
+  });
   view.focus();
 }
 

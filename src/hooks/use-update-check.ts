@@ -83,7 +83,7 @@ function applyCheckResult(
   }
 }
 
-export const useUpdateStore = create<UpdateState>((set, get) => ({
+export const useUpdateStore = create<UpdateState>((set) => ({
   status: "idle",
   currentVersion: null,
   nextVersion: null,

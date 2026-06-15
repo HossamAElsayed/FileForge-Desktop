@@ -68,10 +68,12 @@ export function UpdateAvailableDialog() {
         ) : null}
 
         {showProgress ? (
-          <Progress value={downloadProgress ?? undefined}>
+          <Progress value={downloadProgress}>
             <ProgressLabel>Downloading update</ProgressLabel>
             <ProgressValue>
-              {downloadProgress !== null ? `${downloadProgress}%` : "…"}
+              {(_formattedValue, value) =>
+                value !== null ? `${value}%` : "…"
+              }
             </ProgressValue>
           </Progress>
         ) : null}
