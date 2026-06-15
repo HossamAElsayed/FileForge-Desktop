@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Loader2Icon } from "lucide-react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -13,37 +12,55 @@ import {
   APP_TAGLINE,
 } from "@/lib/app-metadata";
 import { getAppVersion } from "@/lib/tauri/app-info";
-import { checkForUpdates, handleUpdateCheckResult } from "@/lib/tauri/export";
+import { useUpdateCheck } from "@/hooks/use-update-check";
 
 interface AboutPanelProps {
   active: boolean;
 }
 
+function formatLastChecked(iso: string | null): string {
+  if (!iso) return "Never checked";
+  return `Last checked ${new Date(iso).toLocaleString()}`;
+}
+
+function updateStatusLine(
+  isChecking: boolean,
+  hasUpdate: boolean,
+  nextVersion: string | null,
+  status: string,
+  lastChecked: string | null,
+): string {
+  if (isChecking) return "Checking for updates…";
+  if (hasUpdate && nextVersion) return `Update available (v${nextVersion})`;
+  if (status === "up_to_date") return "Up to date";
+  return formatLastChecked(lastChecked);
+}
+
 export function AboutPanel({ active }: AboutPanelProps) {
   const [version, setVersion] = useState<string | null>(null);
-  const [checking, setChecking] = useState(false);
+  const {
+    status,
+    nextVersion,
+    isChecking,
+    hasUpdate,
+    lastUpdateCheckAt,
+    runCheck,
+  } = useUpdateCheck();
 
   useEffect(() => {
     if (!active) return;
     getAppVersion()
       .then(setVersion)
-      .catch(() => setVersion("0.1.1"));
+      .catch(() => setVersion("unknown"));
   }, [active]);
 
-  const handleCheckUpdates = async () => {
-    setChecking(true);
-    try {
-      const result = await checkForUpdates();
-      handleUpdateCheckResult(result);
-    } catch (error) {
-      toast.error("Update check failed", {
-        description:
-          error instanceof Error ? error.message : "Could not check for updates",
-      });
-    } finally {
-      setChecking(false);
-    }
-  };
+  const statusLine = updateStatusLine(
+    isChecking,
+    hasUpdate,
+    nextVersion,
+    status,
+    lastUpdateCheckAt,
+  );
 
   return (
     <div className="flex w-full flex-col gap-3.5">
@@ -66,6 +83,13 @@ export function AboutPanel({ active }: AboutPanelProps) {
           </p>
           <p className="mt-0.5 text-[13px] font-medium text-foreground">
             {version ?? "…"}
+          </p>
+          <p
+            className={`mt-1 text-[11px] ${
+              hasUpdate ? "font-medium text-primary" : "text-muted-foreground"
+            }`}
+          >
+            {statusLine}
           </p>
         </div>
         <div className="rounded-md border border-border/60 bg-background px-3 py-2">
@@ -96,10 +120,10 @@ export function AboutPanel({ active }: AboutPanelProps) {
         <Button
           size="sm"
           className="flex-1"
-          onClick={handleCheckUpdates}
-          disabled={checking}
+          onClick={() => void runCheck({ silent: false })}
+          disabled={isChecking}
         >
-          {checking ? (
+          {isChecking ? (
             <>
               <Loader2Icon className="animate-spin" />
               Checking…

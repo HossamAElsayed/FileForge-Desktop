@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ColorSchemePicker } from "@/components/settings/ColorSchemePicker";
 import type { ThemeMode } from "@/themes";
 import { useSettingsStore } from "@/stores/settings-store";
@@ -41,6 +42,10 @@ export function GeneralSettingsPanel() {
   const setFontSize = useSettingsStore((s) => s.setFontSize);
   const lineHeight = useSettingsStore((s) => s.lineHeight);
   const setLineHeight = useSettingsStore((s) => s.setLineHeight);
+  const checkForUpdatesOnLaunch = useSettingsStore((s) => s.checkForUpdatesOnLaunch);
+  const setCheckForUpdatesOnLaunch = useSettingsStore(
+    (s) => s.setCheckForUpdatesOnLaunch,
+  );
 
   return (
     <div className="flex w-full flex-col gap-3">
@@ -117,6 +122,30 @@ export function GeneralSettingsPanel() {
               </Select>
             </Field>
           </div>
+        </FieldGroup>
+      </SettingsSection>
+
+      <SettingsSection
+        title="Updates"
+        description="Keep FileForge up to date with the latest features and fixes."
+      >
+        <FieldGroup>
+          <Field orientation="horizontal">
+            <FieldContent>
+              <FieldLabel htmlFor="check-updates-on-launch">
+                Check for updates when FileForge opens
+              </FieldLabel>
+              <FieldDescription>
+                You can always check manually from Help → Check for Updates.
+              </FieldDescription>
+            </FieldContent>
+            <Switch
+              id="check-updates-on-launch"
+              checked={checkForUpdatesOnLaunch}
+              onCheckedChange={setCheckForUpdatesOnLaunch}
+              aria-label="Check for updates when FileForge opens"
+            />
+          </Field>
         </FieldGroup>
       </SettingsSection>
     </div>

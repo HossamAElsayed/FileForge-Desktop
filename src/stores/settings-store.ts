@@ -15,6 +15,9 @@ interface SettingsState {
   layoutMode: LayoutMode;
   fontSize: number;
   lineHeight: number;
+  checkForUpdatesOnLaunch: boolean;
+  lastUpdateCheckAt: string | null;
+  lastSeenVersion: string | null;
   preferencesOpen: boolean;
   preferencesTab: PreferencesTab;
   setThemeMode: (mode: ThemeMode) => void;
@@ -23,6 +26,9 @@ interface SettingsState {
   setLayoutMode: (mode: LayoutMode) => void;
   setFontSize: (size: number) => void;
   setLineHeight: (height: number) => void;
+  setCheckForUpdatesOnLaunch: (enabled: boolean) => void;
+  setLastUpdateCheckAt: (iso: string) => void;
+  setLastSeenVersion: (version: string) => void;
   openPreferences: (tab?: PreferencesTab) => void;
   setPreferencesOpen: (open: boolean) => void;
   setPreferencesTab: (tab: PreferencesTab) => void;
@@ -38,6 +44,9 @@ export const useSettingsStore = create<SettingsState>()(
       layoutMode: "split",
       fontSize: 14,
       lineHeight: 1.6,
+      checkForUpdatesOnLaunch: true,
+      lastUpdateCheckAt: null,
+      lastSeenVersion: null,
       preferencesOpen: false,
       preferencesTab: "general",
       setThemeMode: (themeMode) => set({ themeMode }),
@@ -52,6 +61,10 @@ export const useSettingsStore = create<SettingsState>()(
       setLayoutMode: (layoutMode) => set({ layoutMode }),
       setFontSize: (fontSize) => set({ fontSize }),
       setLineHeight: (lineHeight) => set({ lineHeight }),
+      setCheckForUpdatesOnLaunch: (checkForUpdatesOnLaunch) =>
+        set({ checkForUpdatesOnLaunch }),
+      setLastUpdateCheckAt: (lastUpdateCheckAt) => set({ lastUpdateCheckAt }),
+      setLastSeenVersion: (lastSeenVersion) => set({ lastSeenVersion }),
       openPreferences: (tab = "general") =>
         set({ preferencesOpen: true, preferencesTab: tab }),
       setPreferencesOpen: (open) =>
@@ -69,6 +82,9 @@ export const useSettingsStore = create<SettingsState>()(
         layoutMode: state.layoutMode,
         fontSize: state.fontSize,
         lineHeight: state.lineHeight,
+        checkForUpdatesOnLaunch: state.checkForUpdatesOnLaunch,
+        lastUpdateCheckAt: state.lastUpdateCheckAt,
+        lastSeenVersion: state.lastSeenVersion,
       }),
     },
   ),

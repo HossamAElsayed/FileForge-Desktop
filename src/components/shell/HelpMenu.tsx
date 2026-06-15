@@ -3,11 +3,13 @@ import {
   CircleHelpIcon,
   InfoIcon,
   KeyboardIcon,
+  Loader2Icon,
   RefreshCwIcon,
   ScrollTextIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useUpdateCheck } from "@/hooks/use-update-check";
 import type { PreferencesTab } from "@/stores/settings-store";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +24,7 @@ export function HelpMenu({
 }: HelpMenuProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const { isChecking } = useUpdateCheck();
 
   useEffect(() => {
     if (!open) return;
@@ -100,11 +103,16 @@ export function HelpMenu({
           <button
             type="button"
             role="menuitem"
-            className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm hover:bg-accent/10"
+            className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm hover:bg-accent/10 disabled:opacity-50"
+            disabled={isChecking}
             onClick={() => run(onCheckUpdates)}
           >
-            <RefreshCwIcon className="size-3.5 text-muted-foreground" />
-            Check for Updates
+            {isChecking ? (
+              <Loader2Icon className="size-3.5 animate-spin text-muted-foreground" />
+            ) : (
+              <RefreshCwIcon className="size-3.5 text-muted-foreground" />
+            )}
+            {isChecking ? "Checking…" : "Check for Updates"}
           </button>
         </div>
       ) : null}

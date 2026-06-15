@@ -36,3 +36,169 @@
 .cm-editor.cm-focused {
   outline: none;
 }
+
+/* -------------------------------------------------------------------------- */
+/*  Custom find & replace panel                                               */
+/* -------------------------------------------------------------------------- */
+
+.cm-editor .cm-panels-top {
+  border-bottom: 1px solid var(--border);
+}
+
+.cm-editor .cm-panel.ff-search-panel {
+  padding: 0;
+  background: color-mix(in oklab, var(--background) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.ff-search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+}
+
+.ff-search__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ff-search__row--replace {
+  padding-top: 2px;
+  border-top: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+}
+
+.ff-search__input {
+  flex: 1 1 12rem;
+  min-width: 8rem;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius-md, 8px) - 2px);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ff-search__input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.ff-search__input:focus {
+  border-color: color-mix(in oklab, var(--accent) 50%, var(--border));
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+.ff-search__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-md, 8px) - 2px);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ff-search__icon-btn:hover {
+  background: var(--btn-hover);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.ff-search__icon-btn[name="close"] {
+  margin-left: auto;
+}
+
+.ff-search__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius-md, 8px) - 2px);
+  background: var(--background);
+  color: var(--muted-foreground);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ff-search__toggle:hover {
+  background: var(--btn-hover);
+  color: var(--foreground);
+}
+
+.ff-search__toggle[aria-pressed="true"] {
+  background: var(--accent-subtle);
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--border));
+  color: var(--accent);
+}
+
+.ff-search__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ff-search__btn {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius-md, 8px) - 2px);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ff-search__btn:hover {
+  background: var(--btn-hover);
+}
+
+.ff-search__btn--primary {
+  background: var(--primary);
+  border-color: transparent;
+  color: var(--primary-foreground);
+}
+
+.ff-search__btn--primary:hover {
+  background: color-mix(in oklab, var(--primary) 85%, var(--foreground));
+}
+
+.ff-search__row .ff-search__btn[name="select"] {
+  min-width: 36px;
+  padding: 0 8px;
+}

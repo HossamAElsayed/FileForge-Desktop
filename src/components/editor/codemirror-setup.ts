@@ -9,6 +9,11 @@ import {
   syntaxHighlighting,
 } from "@codemirror/language";
 import { languages } from "@codemirror/language-data";
+import {
+  highlightSelectionMatches,
+  search,
+  searchKeymap,
+} from "@codemirror/search";
 import { Compartment, EditorState, type Extension } from "@codemirror/state";
 import {
   drawSelection,
@@ -20,6 +25,14 @@ import {
   placeholder,
 } from "@codemirror/view";
 
+import {
+  insertCodeBlock,
+  insertLink,
+  openReplace,
+  toggleWrap,
+} from "@/lib/editor-commands";
+import { createFileForgeSearchPanel } from "@/components/editor/search-panel";
+
 export interface ThemeOpts {
   dark: boolean;
   fontSize: number;
@@ -28,6 +41,51 @@ export interface ThemeOpts {
 
 const themeCompartment = new Compartment();
 const readOnlyCompartment = new Compartment();
+
+const formatKeymap = keymap.of([
+  {
+    key: "Mod-b",
+    run: (view) => {
+      toggleWrap(view, "**", "**", "text");
+      return true;
+    },
+  },
+  {
+    key: "Mod-i",
+    run: (view) => {
+      toggleWrap(view, "*", "*", "text");
+      return true;
+    },
+  },
+  {
+    key: "Mod-Shift-s",
+    run: (view) => {
+      toggleWrap(view, "~~", "~~", "text");
+      return true;
+    },
+  },
+  {
+    key: "Mod-k",
+    run: (view) => {
+      insertLink(view, "", "url");
+      return true;
+    },
+  },
+  {
+    key: "Mod-e",
+    run: (view) => {
+      insertCodeBlock(view);
+      return true;
+    },
+  },
+  {
+    key: "Mod-h",
+    run: (view) => {
+      openReplace(view);
+      return true;
+    },
+  },
+]);
 
 function buildTheme(opts: ThemeOpts): Extension {
   return EditorView.theme(
@@ -61,6 +119,17 @@ function buildTheme(opts: ThemeOpts): Extension {
       ".cm-activeLine": {
         backgroundColor: "var(--btn-hover)",
       },
+      ".cm-searchMatch": {
+        backgroundColor: "color-mix(in oklab, var(--accent) 25%, transparent)",
+        outline: "1px solid color-mix(in oklab, var(--accent) 40%, transparent)",
+      },
+      ".cm-searchMatch-selected": {
+        backgroundColor: "color-mix(in oklab, var(--accent) 45%, transparent)",
+        outline: "1px solid var(--accent)",
+      },
+      ".cm-selectionMatch": {
+        backgroundColor: "var(--accent-subtle)",
+      },
     },
     { dark: opts.dark },
   );
@@ -91,9 +160,12 @@ function baseExtensions(
       base: markdownLanguage,
       codeLanguages: languages,
     }),
+    search({ top: true, createPanel: createFileForgeSearchPanel }),
+    highlightSelectionMatches(),
     themeCompartment.of(buildTheme(theme)),
     readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
-    keymap.of([...defaultKeymap, ...historyKeymap, ...foldKeymap]),
+    formatKeymap,
+    keymap.of([...searchKeymap, ...defaultKeymap, ...historyKeymap, ...foldKeymap]),
     placeholder("Write or paste markdown here…"),
     EditorView.lineWrapping,
     updateListener,

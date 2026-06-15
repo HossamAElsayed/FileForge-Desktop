@@ -10,15 +10,16 @@ import { EditorLayout } from "@/components/shell/EditorLayout";
 import { RenameDocumentDialog } from "@/components/shell/RenameDocumentDialog";
 import { StatusBar } from "@/components/shell/StatusBar";
 import { TitleBar } from "@/components/shell/TitleBar";
+import { UpdateAvailableDialog } from "@/components/shell/UpdateAvailableDialog";
 import {
   UnsavedChangesDialog,
   type DiscardAction,
 } from "@/components/shell/UnsavedChangesDialog";
 import {
   exportMarkdownToPdf,
-  checkForUpdates,
-  handleUpdateCheckResult,
 } from "@/lib/tauri/export";
+import { getAppVersion } from "@/lib/tauri/app-info";
+import { useUpdateStore } from "@/hooks/use-update-check";
 import { openFilePath, showFileInFolder } from "@/lib/tauri/open-path";
 import { openMarkdownFile } from "@/lib/tauri/open-file";
 import { renameMarkdownFile } from "@/lib/tauri/rename-file";
@@ -230,8 +231,46 @@ export default function App() {
   const setConverting = useDocumentStore((s) => s.setConverting);
   const setConvertProgress = useDocumentStore((s) => s.setConvertProgress);
   const openPreferences = useSettingsStore((s) => s.openPreferences);
+  const checkForUpdatesOnLaunch = useSettingsStore((s) => s.checkForUpdatesOnLaunch);
+  const lastSeenVersion = useSettingsStore((s) => s.lastSeenVersion);
+  const setLastSeenVersion = useSettingsStore((s) => s.setLastSeenVersion);
+  const runUpdateCheck = useUpdateStore((s) => s.runCheck);
 
   useWindowTitle(filename, isDirty);
+
+  useEffect(() => {
+    if (!checkForUpdatesOnLaunch) return;
+    void runUpdateCheck({ silent: true });
+  }, [checkForUpdatesOnLaunch, runUpdateCheck]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const handlePostUpdate = async () => {
+      try {
+        const version = await getAppVersion();
+        if (cancelled) return;
+
+        if (lastSeenVersion === null) {
+          setLastSeenVersion(version);
+          return;
+        }
+
+        if (lastSeenVersion !== version) {
+          openPreferences("changelog");
+          setLastSeenVersion(version);
+        }
+      } catch {
+        // Ignore version read failures on startup.
+      }
+    };
+
+    void handlePostUpdate();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lastSeenVersion, openPreferences, setLastSeenVersion]);
 
   const handleError = useCallback((message: string) => {
     toast.error("Error", { description: message });
@@ -421,10 +460,9 @@ export default function App() {
     withDiscardGuard("close", hideWindow);
   }, [withDiscardGuard, hideWindow]);
 
-  const handleCheckUpdates = useCallback(async () => {
-    const result = await checkForUpdates();
-    handleUpdateCheckResult(result);
-  }, []);
+  const handleCheckUpdates = useCallback(() => {
+    void runUpdateCheck({ silent: false });
+  }, [runUpdateCheck]);
 
   const handleExport = useCallback(async () => {
     if (!content.trim()) return;
@@ -525,6 +563,7 @@ export default function App() {
         </div>
         <StatusBar />
         <PreferencesDialog />
+        <UpdateAvailableDialog />
         <UnsavedChangesDialog
           open={unsavedDialogOpen}
           action={pendingDiscard ?? "new"}

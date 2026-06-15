@@ -17,6 +17,7 @@ import { AboutPanel } from "@/components/settings/AboutPanel";
 import { ChangelogPanel } from "@/components/settings/ChangelogPanel";
 import { GeneralSettingsPanel } from "@/components/settings/GeneralSettingsPanel";
 import { ShortcutsPanel } from "@/components/settings/ShortcutsPanel";
+import { useUpdateCheck } from "@/hooks/use-update-check";
 import {
   useSettingsStore,
   type PreferencesTab,
@@ -65,6 +66,7 @@ export function PreferencesDialog() {
   const tab = useSettingsStore((s) => s.preferencesTab);
   const setPreferencesOpen = useSettingsStore((s) => s.setPreferencesOpen);
   const setPreferencesTab = useSettingsStore((s) => s.setPreferencesTab);
+  const { hasUpdate } = useUpdateCheck();
 
   const activeMeta = NAV_ITEMS.find((item) => item.id === tab) ?? NAV_ITEMS[0];
 
@@ -106,7 +108,14 @@ export function PreferencesDialog() {
                     <span className="absolute top-1/2 left-0 h-4 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
                   )}
                   {item.icon}
-                  {item.label}
+                  <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                    {item.label}
+                    {item.id === "about" && hasUpdate ? (
+                      <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                        Update
+                      </span>
+                    ) : null}
+                  </span>
                 </Button>
               ))}
             </div>

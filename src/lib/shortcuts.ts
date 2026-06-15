@@ -37,6 +37,11 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { keys: `${MOD_LABEL}+Shift+Z`, action: "Redo" },
       { keys: `${MOD_LABEL}+B`, action: "Bold" },
       { keys: `${MOD_LABEL}+I`, action: "Italic" },
+      { keys: `${MOD_LABEL}+Shift+S`, action: "Strikethrough" },
+      { keys: `${MOD_LABEL}+E`, action: "Code" },
+      { keys: `${MOD_LABEL}+K`, action: "Insert link" },
+      { keys: `${MOD_LABEL}+F`, action: "Find" },
+      { keys: `${MOD_LABEL}+H`, action: "Replace" },
     ],
   },
   {

@@ -19,6 +19,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { HelpMenu } from "@/components/shell/HelpMenu";
+import {
+  UpdateDownloadBar,
+  UpdateDownloadStatus,
+} from "@/components/shell/UpdateHeaderProgress";
+import { useUpdateCheck } from "@/hooks/use-update-check";
 import { MOD_LABEL } from "@/lib/keyboard";
 import type { LayoutMode, ThemeMode } from "@/themes";
 import {
@@ -70,6 +75,7 @@ export function TitleBar({
   const isDirty = useDocumentStore((s) => s.isDirty);
   const hasContent = useDocumentStore((s) => s.content.trim().length > 0);
   const isConverting = useDocumentStore((s) => s.isConverting);
+  const { isDownloading } = useUpdateCheck();
 
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -126,21 +132,25 @@ export function TitleBar({
       </div>
 
       <div
-        className="flex min-w-0 justify-center"
+        className="flex min-w-0 justify-center px-2"
         data-tauri-drag-region
       >
-        <button
-          type="button"
-          className="pointer-events-auto max-w-full truncate rounded-md px-2 py-0.5 text-center text-[0.8125rem] font-medium text-muted-foreground transition-colors hover:bg-accent/10 hover:text-foreground"
-          title={`${displayName} (click to rename, F2)`}
-          aria-label={`Rename ${displayName}`}
-          onClick={onRename}
-        >
-          {displayName}
-        </button>
+        {isDownloading ? (
+          <UpdateDownloadStatus />
+        ) : (
+          <button
+            type="button"
+            className="pointer-events-auto max-w-full truncate rounded-md px-2 py-0.5 text-center text-[0.8125rem] font-medium text-muted-foreground transition-colors hover:bg-accent/10 hover:text-foreground"
+            title={`${displayName} (click to rename, F2)`}
+            aria-label={`Rename ${displayName}`}
+            onClick={onRename}
+          >
+            {displayName}
+          </button>
+        )}
       </div>
 
-      <div className="flex items-center justify-end gap-0.5">
+      <div className="flex items-center justify-end gap-1">
         <ToggleGroup
           value={[layoutMode]}
           onValueChange={(next) => {
@@ -169,6 +179,8 @@ export function TitleBar({
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
+
+        <div className="mx-0.5 hidden h-4 w-px bg-border/70 sm:block" aria-hidden />
 
         <Button
           variant="ghost"
@@ -250,6 +262,8 @@ export function TitleBar({
           </Button>
         </div>
       </div>
+
+      <UpdateDownloadBar />
     </header>
   );
 }

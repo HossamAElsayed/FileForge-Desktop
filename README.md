@@ -40,10 +40,10 @@ Produces installers for your current platform (`.msi`/`.exe` on Windows, `.dmg`/
 
 ## Releasing
 
-1. Bump the version in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` to the same value (e.g. `0.1.1`).
+1. Bump the version in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` to the same value (e.g. `0.1.2`).
 2. Add a changelog entry in `src/data/changelog.ts`.
 3. Commit and push to `main`.
-4. Tag and push: `git tag v0.1.1 && git push origin v0.1.1`
+4. Tag and push: `git tag v0.1.2 && git push origin v0.1.2`
 5. GitHub Actions builds installers and `latest.json`, then creates a draft release.
 6. Review assets on GitHub and publish the draft release.
 
@@ -61,6 +61,12 @@ The git tag (`vX.Y.Z`) must match `tauri.conf.json` version (`X.Y.Z`). CI fails 
 | `Ctrl+3` | Preview only |
 | `Ctrl+,` | Settings |
 | `F1` | Keyboard shortcuts |
+| `Ctrl+Z` | Undo |
+| `Ctrl+Shift+Z` | Redo |
+| `Ctrl+B` | Bold |
+| `Ctrl+I` | Italic |
+| `Ctrl+F` | Find |
+| `Ctrl+H` | Replace |
 
 On macOS, use `Cmd` instead of `Ctrl`.
 
